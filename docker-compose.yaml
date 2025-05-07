@@ -1,0 +1,12 @@
+services:
+  db:
+    image: mysql:lts
+    platform: linux/amd64
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: local
+      MYSQL_USER: local
+      MYSQL_PASSWORD: local
+    ports:
+      - "3306:3306"
