@@ -8,9 +8,9 @@ export abstract class RootEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
-  createdAt: Date = new Date();
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date = new Date();
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 }
