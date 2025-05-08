@@ -3,6 +3,8 @@ import { PostModule } from './post/post.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getTypeORMConfig } from './config/typeorm.config';
+import { CommentModule } from './comment/comment.module';
+import { RouterModule } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -17,6 +19,13 @@ import { getTypeORMConfig } from './config/typeorm.config';
       },
     }),
     PostModule,
+    CommentModule,
+    RouterModule.register([
+      {
+        path: 'post/:postId',
+        module: CommentModule,
+      },
+    ]),
   ],
 })
 export class AppModule {}
