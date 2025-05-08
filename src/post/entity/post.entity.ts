@@ -1,5 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany, UpdateDateColumn } from 'typeorm';
 import { RootEntity } from '../../global/entity/root.entity';
+import { Comment } from '../../comment/entity/comment.entity';
+import { InternalServerErrorException } from '@nestjs/common';
 
 type CreatePostParam = {
   title: string;
@@ -13,7 +15,7 @@ export class Post extends RootEntity {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ type: 'text' })
   content: string;
 
   @Column()
@@ -21,6 +23,14 @@ export class Post extends RootEntity {
 
   @Column({ name: 'password' })
   hashedPassword: string;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.post, {
+    cascade: ['insert', 'update', 'remove'],
+  })
+  comments?: Comment[];
 
   static create(param: CreatePostParam) {
     const post = new Post();
@@ -30,6 +40,19 @@ export class Post extends RootEntity {
     post.hashedPassword = param.hashedPassword;
 
     return post;
+  }
+
+  get commentsCount() {
+    if (typeof this.comments === 'undefined') {
+      throw new InternalServerErrorException();
+    }
+
+    return this.comments.reduce((total, comment) => {
+      if (typeof comment.replies === 'undefined') {
+        throw new InternalServerErrorException();
+      }
+      return total + 1 + comment.replies.length;
+    }, 0);
   }
 
   update(param: Partial<Omit<CreatePostParam, 'hashedPassword' | 'writer'>>) {
