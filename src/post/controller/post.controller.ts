@@ -17,7 +17,8 @@ import {
   UpdatePostRequest,
 } from '../dto/post.request.dto';
 import { ApiPaginationResponse } from '../../decorator/pagination.response.decorator';
-import { PostResponse } from '../dto/post.response.dto';
+import { PostListResponse, PostResponse } from '../dto/post.response.dto';
+import { CreateCommentRequest } from '../../comment/dto/comment.request.dto';
 
 @ApiTags('post')
 @Controller('post')
@@ -49,16 +50,25 @@ export class PostController {
   }
 
   @ApiOperation({ summary: '게시글 상세 조회' })
-  @ApiOkResponse({ type: ApiOperation })
+  @ApiOkResponse({ type: PostResponse })
   @Get(':id')
   async getPost(@Param('id') id: number) {
     return this.postService.getOne(id);
   }
 
   @ApiOperation({ summary: '게시글 목록 조회' })
-  @ApiPaginationResponse(PostResponse)
+  @ApiPaginationResponse(PostListResponse)
   @Get()
-  async getPosts(@Query() request: FindPostRequest) {
-    return this.postService.findAll(request);
+  async getPosts(@Query() query: FindPostRequest) {
+    return this.postService.findAll(query);
+  }
+
+  @ApiOperation({ summary: '게시글에 댓글 달기' })
+  @Post(':id/comment')
+  async addComment(
+    @Param('id') id: number,
+    @Body() requestParam: CreateCommentRequest,
+  ) {
+    return this.postService.addComment(id, requestParam);
   }
 }

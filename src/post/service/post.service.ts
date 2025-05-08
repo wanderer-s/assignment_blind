@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PostResponse } from '../dto/post.response.dto';
+import { PostListResponse, PostResponse } from '../dto/post.response.dto';
 import { PaginationResponse } from '../../global/dto/response.dto';
 import {
   CreatePostRequest,
@@ -13,15 +13,21 @@ import {
 } from '../dto/post.request.dto';
 import { Post } from '../entity/post.entity';
 import * as bcrypt from 'bcrypt';
+import { CreateCommentRequest } from '../../comment/dto/comment.request.dto';
+import { CommentRepository } from '../../comment/repository/comment.repository';
+import { Comment } from '../../comment/entity/comment.entity';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly postRepository: PostRepository) {}
+  constructor(
+    private readonly postRepository: PostRepository,
+    private readonly commentRepository: CommentRepository,
+  ) {}
 
   async findAll(param: FindPostRequest) {
     const [posts, count] = await this.postRepository.findAll(param);
 
-    const postsResponse = posts.map((post) => PostResponse.of(post));
+    const postsResponse = posts.map((post) => PostListResponse.of(post));
 
     return new PaginationResponse(
       postsResponse,
@@ -83,5 +89,12 @@ export class PostService {
     }
 
     await this.postRepository.remove(post);
+  }
+
+  async addComment(id: number, param: CreateCommentRequest) {
+    const post = await this.getOneById(id);
+
+    const comment = Comment.create({ ...param, postId: post.id });
+    await this.commentRepository.save(comment);
   }
 }
