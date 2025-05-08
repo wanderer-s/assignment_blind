@@ -10,7 +10,15 @@ export class PostRepository extends Repository<Post> {
   }
 
   async findAll({ skip, limit, keywordType, keyword }: FindPostRequest) {
-    const qb = this.createQueryBuilder('post');
+    const qb = this.createQueryBuilder('post')
+      .select([
+        'post.id',
+        'post.title',
+        'post.writer',
+        'post.createdAt',
+        'post.updatedAt',
+      ])
+      .leftJoinAndSelect('post.comments', 'comment');
 
     if (keyword) {
       if (keywordType === KeywordType.WRITER) {
