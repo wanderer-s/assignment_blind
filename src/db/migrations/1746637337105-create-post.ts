@@ -6,7 +6,7 @@ export class CreatePost1746637337105 implements MigrationInterface {
             CREATE TABLE post (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
-                content VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
                 writer VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
