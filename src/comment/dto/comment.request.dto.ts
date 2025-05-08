@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsPositive } from 'class-validator';
+import { IsOptional, IsPositive, IsString } from 'class-validator';
 
 export class FindCommentRequest {
   @ApiProperty({ required: false, default: 10 })
@@ -11,4 +11,14 @@ export class FindCommentRequest {
   @IsOptional()
   @IsPositive()
   beforeId?: number;
+}
+
+export class CreateCommentRequest {
+  @ApiProperty()
+  @IsString()
+  content: string;
+
+  @ApiProperty()
+  @IsString()
+  writer: string;
 }
