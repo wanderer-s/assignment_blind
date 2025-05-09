@@ -7,6 +7,8 @@ import { CommentModule } from './comment/comment.module';
 import { RouterModule } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis, { Keyv } from '@keyv/redis';
+import { KeywordModule } from './keyword/keyword.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -35,6 +37,19 @@ import KeyvRedis, { Keyv } from '@keyv/redis';
         };
       },
     }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          connection: {
+            host: configService.get<string>('QUEUE_HOST'),
+            port: +configService.getOrThrow<string>('QUEUE_PORT'),
+          },
+        };
+      },
+    }),
+    KeywordModule,
     PostModule,
     CommentModule,
     RouterModule.register([
