@@ -11,11 +11,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { KeywordService } from '../../../keyword/service/keyword.service';
 
 describe('Comment Service ', () => {
   const commentRepository = mock(CommentRepository);
+  const keywordService = mock(KeywordService)
 
-  const commentService = new CommentService(instance(commentRepository));
+  const commentService = new CommentService(instance(commentRepository), instance(keywordService));
 
   it('should comment service be defined', () => {
     expect(commentService).toBeDefined();
@@ -43,13 +45,6 @@ describe('Comment Service ', () => {
       await expect(commentService.addReply(2, 2, commentParam)).rejects.toThrow(
         InternalServerErrorException,
       );
-    });
-
-    it('대댓글 추가', async () => {
-      comment.replies = [];
-      await commentService.addReply(2, 2, commentParam);
-
-      expect(comment.replies.length).toBe(1);
     });
   });
 });

@@ -7,14 +7,17 @@ import { PostResponse } from '../../dto/post.response.dto';
 import * as bcrypt from 'bcrypt';
 import { FindPostRequest } from '../../dto/post.request.dto';
 import { CommentRepository } from '../../../comment/repository/comment.repository';
+import { KeywordService } from '../../../keyword/service/keyword.service';
 
 describe('Post Service Test', () => {
   const postRepository = mock(PostRepository);
   const commentRepository = mock(CommentRepository);
+  const keywordService = mock(KeywordService)
 
   const postService = new PostService(
     instance(postRepository),
     instance(commentRepository),
+    instance(keywordService)
   );
 
   it('should post service defined', () => {
