@@ -84,6 +84,9 @@ export class KeywordService {
 
   async addIncludesKeywords(content: string, contentType: ContentsType) {
     const includesKeywordData = await this.checkIncludeKeywords(content);
+    if (Object.keys(includesKeywordData).length === 0) {
+      return;
+    }
     await this.addSendAlarmQueue(includesKeywordData, contentType);
   }
 }
