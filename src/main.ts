@@ -18,6 +18,11 @@ async function bootstrap() {
   );
 
   setSwaggerConfig(app);
+
+  app.enableCors({
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
