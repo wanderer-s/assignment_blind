@@ -18,7 +18,8 @@ export class PostRepository extends Repository<Post> {
         'post.createdAt',
         'post.updatedAt',
       ])
-      .leftJoinAndSelect('post.comments', 'comment');
+      .leftJoinAndSelect('post.comments', 'comment')
+      .leftJoinAndSelect('comment.replies', 'reply');
 
     if (keyword) {
       if (keywordType === KeywordType.WRITER) {
