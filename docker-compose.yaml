@@ -10,3 +10,8 @@ services:
       MYSQL_PASSWORD: local
     ports:
       - "3306:3306"
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - '6379:6379'
