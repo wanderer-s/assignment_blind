@@ -1,98 +1,76 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 설치 및 설정 방법
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+1. Node.js 설치<br> 이 프로젝트는 node 환경에서 실행되는 Nestjs 기반으로 작성되었습니다. 따라서 node를 설치해야 합니다<br>
+   [Node.js 다운로드](https://nodejs.org/ko)<br> 참고로 이 코드는 20.19.1 버젼에서 작성되었습니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+2. 이 프로젝트는 pnpm으로 패키지 관리를 하고 있습니다 node.js를 설치하며 함께 설치된 npm으로 pnpm을 설치해 줍니다
+```
+npm install pnpm
+```
+3. 패키지 설치<br>
+```
+pnpm install
+```
+4. 환경변수 설정
+app에서 사용하는 각종 환경변수를 .env로 설정해줍니다
+```
+# DB
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=local
+DB_PASSWORD=local
+DB_DATABASE=local
+DB_LOGGING=false
+DB_SYNC=false
 
-## Description
+# REDIS
+REDIS_HOST=redis://localhost:6379
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# Queue
+QUEUE_HOST=localhost
+QUEUE_PORT=6379
 
-## Project setup
-
-```bash
-$ pnpm install
+```
+5. docker-compose 로 local에서 구동되는 database 를 실행시켜 줍니다<br>
+**docker-compose** 를 실행시킬 수 있는 환경이어야 합니다 docker 또는 OrbStack 설치를 권장합니다
+```
+docker-compose up -d
+```
+이 명령어로 app에서 필요한 **mySQL**과 **Redis**가 구동됩니다
+6. 비어있는 database에 table 과 필요한 최소 data 입력을 위해 typeOrm migration 을 실행시켜줍니다
+```
+pnpm run migration:run
+```
+7. 서버를 실행합니다
+```
+pnpm start
 ```
 
-## Compile and run the project
+# API 문서
+서버를 실행하게 되면 [swagger api 문서](localhost:3000/api-docs) 를 통해 각 api별 설명을 확인할 수 있으며 호출까지 할 수 있음
 
-```bash
-# development
-$ pnpm run start
+# 설계 내용
+## 게시글
+- 게시글 목록 조회
+   - offset 기반의 Pagination
+   - 제목 또는 작성자로 검색 가능
+   - 게시글 제목과 작성자, 댓글 개수 확인 가능
+- 게시글 상세 조회
+  - 게시글 내용 확인 
+- 게시글 생성
+- 게시글 수정 및 삭제
+  - 비밀번호가 일치하지 않으면 할 수 없음
+  - 게시글 삭제시 해당 게시글에 작성된 댓글 함께 삭제
+## 댓글
+- 댓글 목록 조회
+  - cursor 기반의 pagination(댓글은 게시글 만큼 page 번호를 통해 이동하는 사용성보다는 `댓글더보기` 같은 기능이 더 어울릴것이라 판단) 
+- 댓글 생성
+- 대댓글 생성
 
-# watch mode
-$ pnpm run start:dev
+## 키워드
+- 등록된 키워드로 알림 발송
+  - 게시글, 댓글, 대댓글 작성 시 키워드 확인 후 알림처리를 위해 queue 처리(redis)
+  - 여러 사람이 같은 키워드로 등록이 가능하기 때문에 unique 한 키워드 값으로 작성자 그룹화(알림 처리 시 반복 횟수 감소)
+  - 키워드를 확인하기 위해선 모든 키워드를 조회해야 하기 때문에 db 부하를 최소화 하기 위한 cache 처리
 
-# production mode
-$ pnpm run start:prod
-```
 
-## Run tests
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
