@@ -37,6 +37,11 @@ QUEUE_PORT=6379
 docker-compose up -d
 ```
 이 명령어로 app에서 필요한 **mySQL**과 **Redis**가 구동됩니다
+5. 서버 build<br>
+build된 파일을 통해 database migration이 필요하여 build를 해줍니다
+```
+pnpm build
+```
 6. 비어있는 database에 table 과 필요한 최소 data 입력을 위해 typeOrm migration 을 실행시켜줍니다
 ```
 pnpm run migration:run
