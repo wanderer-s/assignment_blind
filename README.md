@@ -5,7 +5,7 @@
 
 2. 이 프로젝트는 pnpm으로 패키지 관리를 하고 있습니다 node.js를 설치하며 함께 설치된 npm으로 pnpm을 설치해 줍니다
 ```
-npm install pnpm
+npm install -g pnpm@latest-10
 ```
 3. 패키지 설치<br>
 ```
