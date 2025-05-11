@@ -53,7 +53,7 @@ pnpm start
 ```
 
 # API 문서
-서버를 실행하게 되면 [swagger api 문서](localhost:3000/api-docs) 를 통해 각 api별 설명을 확인할 수 있으며 호출까지 할 수 있음
+서버를 실행하게 되면 [swagger api 문서](http://localhost:3000/api-docs) 를 통해 각 api별 설명을 확인할 수 있으며 호출까지 할 수 있음
 
 # 설계 내용
 ## 게시글
