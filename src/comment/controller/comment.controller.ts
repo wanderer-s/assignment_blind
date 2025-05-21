@@ -20,6 +20,15 @@ export class CommentController {
     return this.commentService.findAll(postId, query);
   }
 
+  @ApiOperation({ summary: '게시글에 댓글 달기' })
+  @Post()
+  async addComment(
+    @Param('postId') postId: number,
+    @Body() requestParam: CreateCommentRequest,
+  ) {
+    return this.commentService.addComment(postId, requestParam);
+  }
+
   @ApiOperation({ summary: '대댓글 작성' })
   @Post(':id/reply')
   async addReply(

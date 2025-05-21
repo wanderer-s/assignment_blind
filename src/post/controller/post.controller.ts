@@ -1,24 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PostService } from '../service/post.service';
-import {
-  CreatePostRequest,
-  DeletePostRequest,
-  FindPostRequest,
-  UpdatePostRequest,
-} from '../dto/post.request.dto';
+import { CreatePostRequest, DeletePostRequest, FindPostRequest, UpdatePostRequest } from '../dto/post.request.dto';
 import { ApiPaginationResponse } from '../../decorator/pagination.response.decorator';
 import { PostListResponse, PostResponse } from '../dto/post.response.dto';
-import { CreateCommentRequest } from '../../comment/dto/comment.request.dto';
 
 @ApiTags('post')
 @Controller('post')
@@ -61,14 +46,5 @@ export class PostController {
   @Get()
   async getPosts(@Query() query: FindPostRequest) {
     return this.postService.findAll(query);
-  }
-
-  @ApiOperation({ summary: '게시글에 댓글 달기' })
-  @Post(':id/comment')
-  async addComment(
-    @Param('id') id: number,
-    @Body() requestParam: CreateCommentRequest,
-  ) {
-    return this.postService.addComment(id, requestParam);
   }
 }

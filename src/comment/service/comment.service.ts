@@ -1,15 +1,34 @@
 import { CommentRepository } from '../repository/comment.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCommentRequest, FindCommentRequest } from '../dto/comment.request.dto';
-import { CommentCursorResponse, CommentResponse } from '../dto/comment.response.dto';
+import {
+  CreateCommentRequest,
+  FindCommentRequest,
+} from '../dto/comment.request.dto';
+import {
+  CommentCursorResponse,
+  CommentResponse,
+} from '../dto/comment.response.dto';
 import { KeywordService } from '../../keyword/service/keyword.service';
+import { Comment } from '../entity/comment.entity';
+import { PostService } from '../../post/service/post.service';
 
 @Injectable()
 export class CommentService {
   constructor(
     private readonly commentRepository: CommentRepository,
     private readonly keywordService: KeywordService,
+    private readonly postService: PostService,
   ) {}
+
+  async addComment(id: number, param: CreateCommentRequest) {
+    const post = await this.postService.getOne(id);
+
+    const comment = Comment.create({ ...param, postId: post.id });
+    await this.commentRepository.save(comment);
+    this.keywordService
+      .addIncludesKeywords(param.content, 'COMMENT')
+      .catch((err) => console.log(`댓글 알람 queue err: ${err}`));
+  }
 
   async addReply(
     postId: number,
