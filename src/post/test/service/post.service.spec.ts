@@ -6,18 +6,15 @@ import { Post } from '../../entity/post.entity';
 import { PostResponse } from '../../dto/post.response.dto';
 import * as bcrypt from 'bcrypt';
 import { FindPostRequest } from '../../dto/post.request.dto';
-import { CommentRepository } from '../../../comment/repository/comment.repository';
 import { KeywordService } from '../../../keyword/service/keyword.service';
 
 describe('Post Service Test', () => {
   const postRepository = mock(PostRepository);
-  const commentRepository = mock(CommentRepository);
   const keywordService = mock(KeywordService)
 
   const postService = new PostService(
     instance(postRepository),
-    instance(commentRepository),
-    instance(keywordService)
+    instance(keywordService),
   );
 
   it('should post service defined', () => {
@@ -136,25 +133,6 @@ describe('Post Service Test', () => {
       await expect(postService.delete(2, 'wrongPassword')).rejects.toThrow(
         ForbiddenException,
       );
-    });
-  });
-
-  describe('addComment - 게시글에 댓글 작성', () => {
-    const post = Post.create({
-      title: 'title',
-      content: 'content',
-      writer: 'writer',
-      hashedPassword: bcrypt.hashSync('hashedPassword', 10),
-    });
-    post.comments = [];
-
-    it('주어진 id로 post 를 조회할 수 없는 경우 예외 처리', async () => {
-      await expect(
-        postService.addComment(1, {
-          content: 'new Comment',
-          writer: 'new Writer',
-        }),
-      ).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -12,15 +12,44 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { KeywordService } from '../../../keyword/service/keyword.service';
+import { Post } from '../../../post/entity/post.entity';
+import * as bcrypt from 'bcrypt';
+import { PostService } from '../../../post/service/post.service';
 
 describe('Comment Service ', () => {
   const commentRepository = mock(CommentRepository);
-  const keywordService = mock(KeywordService)
+  const keywordService = mock(KeywordService);
+  const postService = mock(PostService);
 
-  const commentService = new CommentService(instance(commentRepository), instance(keywordService));
+  const commentService = new CommentService(
+    instance(commentRepository),
+    instance(keywordService),
+    instance(postService),
+  );
 
   it('should comment service be defined', () => {
     expect(commentService).toBeDefined();
+  });
+
+  describe('addComment - 게시글에 댓글 작성', () => {
+    const post = Post.create({
+      title: 'title',
+      content: 'content',
+      writer: 'writer',
+      hashedPassword: bcrypt.hashSync('hashedPassword', 10),
+    });
+    post.comments = [];
+
+    when(postService.getOne(1)).thenReject(new NotFoundException());
+
+    it('주어진 id로 post 를 조회할 수 없는 경우 예외 처리', async () => {
+      await expect(
+        commentService.addComment(1, {
+          content: 'new Comment',
+          writer: 'new Writer',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
   });
 
   describe('addReply - 대댓글 작성', () => {
